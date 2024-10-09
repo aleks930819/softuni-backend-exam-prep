@@ -83,24 +83,33 @@ router.get('/all-posts', async (req, res) => {
 router.get('/:id', async (req, res) => {
   const { id } = req.params;
   const userId = req.user ? req.user.id : null;
-  const objectId = new mongoose.Types.ObjectId(userId.toString());
-
-  const post = await getPostById(id);
-
-  const isOwner = req.user ? req.user.id === post.owner._id.toString() : false;
   const isLoggedIn = req.user ? true : false;
-  const hasVoted = post.votes.some((voteId) => voteId.equals(objectId));
 
-  const canVote = isLoggedIn && !hasVoted && !isOwner;
+  const objectId = isLoggedIn
+    ? new mongoose.Types.ObjectId(userId.toString())
+    : null;
 
-  res.render('post/details', {
-    title: 'Post',
-    post,
-    isOwner,
-    isLoggedIn,
-    hasVoted,
-    canVote,
-  });
+  try {
+    const post = await getPostById(id);
+    const isOwner = req.user
+      ? req.user.id === post.owner._id.toString()
+      : false;
+    const hasVoted =
+      isLoggedIn && post.votes.some((voteId) => voteId.equals(objectId));
+    const canVote = isLoggedIn && !hasVoted && !isOwner;
+
+    res.render('post/details', {
+      title: 'Post',
+      post,
+      isOwner,
+      isLoggedIn,
+      hasVoted,
+      canVote,
+    });
+    // eslint-disable-next-line no-unused-vars
+  } catch (error) {
+    res.redirect('/posts/all-posts');
+  }
 });
 
 // ____ POST Routes ____
@@ -121,24 +130,44 @@ router.post(
 
     const owner = req?.user?.id;
     req.body.owner = owner;
-    const post = await createPost(req.body);
-    res.redirect(`/posts/${post._id}`);
+    try {
+      const post = await createPost(req.body);
+      res.redirect(`/posts/${post._id}`);
+    } catch (error) {
+      return renderPageWithErrors({
+        errors: [error.message],
+        page: 'post/create',
+        res,
+        title: 'Create Post',
+      });
+    }
   }
 );
 
 router.post('/edit/:id', protect, async (req, res) => {
   const { id } = req.params;
-  const post = await getPostById(id);
+  try {
+    const post = await getPostById(id);
 
-  const isOwner = req.user ? req.user.id === post.owner._id.toString() : false;
+    const isOwner = req.user
+      ? req.user.id === post.owner._id.toString()
+      : false;
 
-  if (!post || !isOwner) {
-    return res.redirect('/posts/all-posts');
+    if (!post || !isOwner) {
+      return res.redirect('/posts/all-posts');
+    }
+
+    await updatePostById(id, req.body);
+
+    res.redirect(`/posts/${id}`);
+  } catch (error) {
+    return renderPageWithErrors({
+      errors: [error.message],
+      page: 'post/edit',
+      res,
+      title: 'Edit Post',
+    });
   }
-
-  await updatePostById(id, req.body);
-
-  res.redirect(`/posts/${id}`);
 });
 
 module.exports = router;

@@ -7,6 +7,9 @@
 
       <form method="POST" class="editForm" action="/posts/edit/{{post._id}}">
         <h2>Edit Post</h2>
+        {{#if errors}}
+        {{> error-message }}
+        {{/if}}
         <ul class="noBullet">
           <li>
             <label for="name">Name:</label>

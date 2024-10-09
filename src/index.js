@@ -25,7 +25,14 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 
 // View engine
-app.engine('hbs', handlebars.engine({ extname: 'hbs' }));
+app.engine(
+  'hbs',
+  handlebars.engine({
+    extname: 'hbs',
+    defaultLayout: 'main',
+    partialsDir: path.join(__dirname, 'views', 'partials'),
+  })
+);
 app.set('view engine', 'hbs');
 app.set('views', path.join(__dirname, './views'));
 

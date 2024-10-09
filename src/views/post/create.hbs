@@ -10,14 +10,9 @@
         <h2>Create Post</h2>
         <ul class="noBullet">
           {{#if errors}}
-          <div class="error-message">
-            <ul>
-              {{#each errors}}
-              <li>{{this}}</li>
-              {{/each}}
-            </ul>
-          </div>
+          {{> error-message }}
           {{/if}}
+
           <li>
             <label for="title">Name:</label>
             <input type="text" class="inputFields" id="name" placeholder="Delphini" name="name" value="" />

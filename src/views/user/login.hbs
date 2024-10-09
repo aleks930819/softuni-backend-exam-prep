@@ -9,13 +9,7 @@
       <form action="#" method="POST" class="loginForm">
         <h2>Login</h2>
         {{#if errors}}
-        <div class="error-message">
-          <ul>
-            {{#each errors}}
-            <li>{{this}}</li>
-            {{/each}}
-          </ul>
-        </div>
+        {{> error-message }}
         {{/if}}
         <ul class="noBullet">
           <li>

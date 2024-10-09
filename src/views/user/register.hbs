@@ -9,15 +9,8 @@
       <form action="#" method="POST" class="signupForm">
         <h2>Sign Up</h2>
         {{#if errors}}
-        <div class="error-message">
-          <ul>
-            {{#each errors}}
-            <li>{{this}}</li>
-            {{/each}}
-          </ul>
-        </div>
+        {{> error-message }}
         {{/if}}
-
         <ul class="noBullet">
           <li>
             <label for="first-name">First Name:</label>
