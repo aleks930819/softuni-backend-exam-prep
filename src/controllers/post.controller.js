@@ -24,60 +24,99 @@ router.get('/create-post', (req, res) => {
 });
 router.get('/my-posts', protect, async (req, res) => {
   const { id } = req.user;
-  const posts = await getMyPosts(id);
-  res.render('user/my-posts', { title: 'My Posts', posts });
+  try {
+    const posts = await getMyPosts(id);
+    res.render('user/my-posts', { title: 'My Posts', posts });
+    // eslint-disable-next-line no-unused-vars
+  } catch (error) {
+    res.redirect('/posts/all-posts');
+  }
 });
 
 router.get('/edit/:id', protect, async (req, res) => {
   const { id } = req.params;
-  const post = await getPostById(id);
+  try {
+    const post = await getPostById(id);
 
-  if (!post) {
-    return res.redirect('/posts/all-posts');
+    if (!post) {
+      return res.redirect('/posts/all-posts');
+    }
+
+    res.render('post/edit', { title: 'Edit Post', post });
+  } catch (error) {
+    return renderPageWithErrors({
+      errors: [error.message],
+      page: 'post/edit',
+      res,
+      title: 'Edit Post',
+    });
   }
-
-  res.render('post/edit', { title: 'Edit Post', post });
 });
 
 router.get('/delete/:id', protect, async (req, res) => {
   const { id } = req.params;
-  const post = await getPostById(id);
-  const isOwner = req.user ? req.user.id === post.owner._id.toString() : false;
+  try {
+    const post = await getPostById(id);
+    const isOwner = req.user
+      ? req.user.id === post.owner._id.toString()
+      : false;
 
-  if (!post || !isOwner) {
-    return res.redirect('/posts/all-posts');
+    if (!post || !isOwner) {
+      return res.redirect('/posts/all-posts');
+    }
+
+    await deletePostById(id);
+
+    res.redirect('/posts/all-posts');
+  } catch (error) {
+    return renderPageWithErrors({
+      errors: [error.message],
+      page: 'post/edit',
+      res,
+      title: 'Edit Post',
+    });
   }
-
-  await deletePostById(id);
-
-  res.redirect('/posts/all-posts');
 });
 
 router.get('/vote/:id', protect, async (req, res) => {
   const { id } = req.params;
-  const post = await getPostById(id);
+  try {
+    const post = await getPostById(id);
 
-  const userId = req.user.id;
-  const objectId = new mongoose.Types.ObjectId(userId.toString());
-  const hasVoted = post.votes.includes(objectId);
+    const userId = req.user.id;
+    const objectId = new mongoose.Types.ObjectId(userId.toString());
+    const hasVoted = post.votes.includes(objectId);
 
-  if (hasVoted) {
-    return res.redirect(`/posts/${id}`);
+    if (hasVoted) {
+      return res.redirect(`/posts/${id}`);
+    }
+
+    const modifiedPostWithVote = {
+      ...post,
+      votes: [...post.votes, userId],
+    };
+
+    await updatePostById(id, modifiedPostWithVote);
+
+    res.redirect(`/posts/${id}`);
+  } catch (error) {
+    return renderPageWithErrors({
+      errors: [error.message],
+      page: 'post/details',
+      res,
+      title: 'Post',
+    });
   }
-
-  const modifiedPostWithVote = {
-    ...post,
-    votes: [...post.votes, userId],
-  };
-
-  await updatePostById(id, modifiedPostWithVote);
-
-  res.redirect(`/posts/${id}`);
 });
 
 router.get('/all-posts', async (req, res) => {
-  const posts = await getAllPosts();
-  res.render('post/all-posts', { title: 'All Posts', posts });
+  try {
+    const posts = await getAllPosts();
+    res.render('post/all-posts', { title: 'All Posts', posts });
+    // eslint-disable-next-line no-unused-vars
+  } catch (error) {
+    res.redirect('/posts/all-posts');
+  }
 });
 
 router.get('/:id', async (req, res) => {
