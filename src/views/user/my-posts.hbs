@@ -1,0 +1,33 @@
+<main>
+  <section id="my-posts">
+    <h1>My Posts</h1>
+
+    <div class="my-container">
+      <!-- Check if there are any posts -->
+      {{#if posts.length}}
+      {{#each posts}}
+      <div class="my-card">
+        <div class="card-header">
+          <img src="{{this.image}}" alt="{{this.name}}" />
+        </div>
+        <div class="card-body">
+          <span class="tag tag-teal">Species: {{this.species}}</span>
+          <h4>Name: {{this.name}}</h4>
+          <div class="user">
+            <div class="user-info">
+              <h5>Author: {{this.owner.firstName}} {{this.owner.lastName}}</h5>
+              <small>Rating of votes: {{this.votes.length}}</small>
+              <a href="/posts/{{this._id}}" class="details_btn">Details</a>
+            </div>
+          </div>
+        </div>
+      </div>
+      {{/each}}
+      {{else}}
+      <div class="no-posts">
+        <p class="no-offer">There are no own posts yet...</p>
+      </div>
+      {{/if}}
+    </div>
+  </section>
+</main>

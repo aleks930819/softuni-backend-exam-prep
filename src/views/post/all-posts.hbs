@@ -1,0 +1,27 @@
+<main>
+  <section id="catalog">
+    <h1>All Posts</h1>
+    <div class="band">
+      {{#if posts.length}}
+      {{#each posts}}
+      <div class="flip flip-vertical">
+        <div class="front">
+          <img src="{{image}}" alt="{{name}}">
+        </div>
+        <div class="back">
+          <h1>{{name}}</h1>
+          <h2>Species: {{species}}</h2>
+          <p>Description: {{description}}</p>
+          <a href="/posts/{{_id}}" class="details">Details</a>
+        </div>
+      </div>
+
+      {{/each}}
+      {{else}}
+      <div class="no-posts">
+        <p class="no-offer">There are no posts yet..</p>
+      </div>
+      {{/if}}
+    </div>
+  </section>
+</main>
