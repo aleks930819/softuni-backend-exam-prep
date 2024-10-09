@@ -7,6 +7,7 @@ const express = require('express');
 const path = require('path');
 const handlebars = require('express-handlebars');
 const cookieParser = require('cookie-parser');
+const mongoSanitize = require('express-mongo-sanitize');
 
 // Local imports
 const { auth } = require('./middlewares/auth');
@@ -23,6 +24,9 @@ app.use(express.json());
 app.use(express.static(path.join(__dirname, './public')));
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
+
+// Sanitize data
+app.use(mongoSanitize());
 
 // View engine
 app.engine(
